@@ -4,12 +4,12 @@ import { BillAnalysisResult } from '../types/bill';
 export async function analyzeBill(file: File): Promise<BillAnalysisResult> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-  if (!apiKey || apiKey === 'your_gemini_api_key_here') {
+  if (!apiKey || apiKey === 'AIzaSyDpL6AGWvhpJyEkoDreRJ-rQ6iGgfcfZyg') {
     throw new Error('Please configure your Gemini API key in the .env file');
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-exp' });
 
   const fileBytes = await file.arrayBuffer();
   const base64Data = arrayBufferToBase64(fileBytes);
