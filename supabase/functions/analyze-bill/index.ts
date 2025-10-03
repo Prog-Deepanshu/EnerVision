@@ -34,9 +34,15 @@ Deno.serve(async (req: Request) => {
     }
 
     const fileBytes = await file.arrayBuffer();
-    const base64Data = btoa(
-      String.fromCharCode(...new Uint8Array(fileBytes))
-    );
+    const uint8Array = new Uint8Array(fileBytes);
+
+    let binary = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+      const chunk = uint8Array.subarray(i, i + chunkSize);
+      binary += String.fromCharCode.apply(null, Array.from(chunk));
+    }
+    const base64Data = btoa(binary);
 
     let mimeType = file.type;
     if (mimeType === "application/pdf") {
@@ -54,7 +60,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const genAI = new GoogleGenerativeAI(geminiApiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `You are an expert energy analyst. Analyze this electricity bill and extract the following information in JSON format:
 
