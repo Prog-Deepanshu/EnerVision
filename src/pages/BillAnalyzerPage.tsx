@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Upload, FileText, Loader2, AlertCircle } from 'lucide-react';
 import BillResults from '../components/BillResults';
 import { BillAnalysisResult } from '../types/bill';
+import { analyzeBill } from '../services/geminiApi';
 
 export default function BillAnalyzerPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -41,25 +42,7 @@ export default function BillAnalyzerPage() {
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append('bill', file);
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-bill`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to analyze bill. Please try again.');
-      }
-
-      const data = await response.json();
+      const data = await analyzeBill(file);
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while analyzing the bill');
